@@ -87,6 +87,34 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
   }
 
   /**
+   * @dev Destroys `amout` tokens spread on each account in `accounts` in
+   * in prorata of the number of token they hold
+   *
+   * Requirements:
+   *
+   * - the caller must have burner role
+   */
+  function burnProrata(address[] memory accounts, uint256 amount) public onlyRole(BURNER_ROLE) {
+    require(accounts.length > 0, "CMTAT: No accounts given");
+    require(amount > 0, "CMTAT: amount of tokens to burn must be greater than 0");
+
+    uint256 totalAmount = 0;
+    for (uint256 i = 0; i < accounts.length; i++) {
+      totalAmount += balanceOf(accounts[i]);
+    }
+
+    uint256 runningTotal = 0;
+    for (uint256 i = 0; i < accounts.length; i++) {
+      uint256 oldRunningTotal = runningTotal;
+      runningTotal += balanceOf(accounts[i]) * amount / totalAmount;
+      //burnFrom(accounts[0], runningTotal - oldRunningTotal);
+
+      _burn(accounts[i], runningTotal - oldRunningTotal);
+      emit Burn(accounts[i], runningTotal - oldRunningTotal);
+    }
+  }
+
+  /**
     * @dev Pauses all token transfers.
     *
     * See {ERC20Pausable} and {Pausable-_pause}.
