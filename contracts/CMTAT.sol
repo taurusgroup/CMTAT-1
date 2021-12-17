@@ -87,8 +87,11 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
   }
 
   /**
-   * @dev Destroys `amout` tokens spread on each account in `accounts` in
+   * @dev Destroys `amount` tokens spread on each account in `accounts` in
    * in prorata of the number of token they hold
+   *
+   * @notice The amount burned for each holder is rounded down which can lead
+   * to inequalities since we cannot burn part of a token
    *
    * Requirements:
    *
@@ -98,16 +101,17 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
     require(accounts.length > 0, "CMTAT: No accounts given");
     require(amount > 0, "CMTAT: amount of tokens to burn must be greater than 0");
 
-    uint256 totalAmount = 0;
+    uint256 totalBalance = 0;
     for (uint256 i = 0; i < accounts.length; i++) {
-      totalAmount += balanceOf(accounts[i]);
+      totalBalance += balanceOf(accounts[i]);
     }
+
+    require(totalBalance >= amount, "CMTAT: Amount to burn greater than total balance");
 
     uint256 runningTotal = 0;
     for (uint256 i = 0; i < accounts.length; i++) {
       uint256 oldRunningTotal = runningTotal;
-      runningTotal += balanceOf(accounts[i]) * amount / totalAmount;
-      //burnFrom(accounts[0], runningTotal - oldRunningTotal);
+      runningTotal += balanceOf(accounts[i]) * amount / totalBalance;
 
       _burn(accounts[i], runningTotal - oldRunningTotal);
       emit Burn(accounts[i], runningTotal - oldRunningTotal);
