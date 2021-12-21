@@ -29,13 +29,15 @@ Only authorized users are allowed to call this function.
 ##### Signature:
 
 ```solidity
-    function burnProrata(address[] memory accounts, uint256 amount) public onlyRole(BURNER_ROLE) {
+    function burnProrata(address[] memory accounts, uint256 amount)
+    public
 ```
 
 ##### Description:
 
 Destroys the `amount` tokens spread on each account in `accounts` in
-prorata of the number of tokens they hold 
+prorata of the number of tokens they hold.
+Only authorized users are allowed to call this function.
 
 ### Events
 
