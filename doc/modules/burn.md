@@ -24,6 +24,21 @@ Redeem the given `amount` of tokens from the given `account`.
 The owner should `approve` the redemption in advance in the same way as `transferFrom` calls are approved.
 Only authorized users are allowed to call this function.
 
+#### `burnProrata(address[], uint256)`
+
+##### Signature:
+
+```solidity
+    function burnProrata(address[] memory accounts, uint256 amount)
+    public
+```
+
+##### Description:
+
+Destroys the `amount` tokens spread on each account in `accounts` in
+prorata of the number of tokens they hold.
+Only authorized users are allowed to call this function.
+
 ### Events
 
 #### `Burn(address,uint)`
