@@ -19,8 +19,18 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
   uint8 constant TRANSFER_OK = 0;
   string constant TEXT_TRANSFER_OK = "No restriction";
 
-  function initialize (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms) public initializer {
+  string public assetClassification;
+  string public indicator;
+  string public holder;
+  string public informationOnMixedHolding;  
+
+  constructor (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms, string memory assetClassification_, string memory indicator_, string memory holder_, string memory informationOnMixedHolding_) {
     __CMTAT_init(owner, forwarder, name, symbol, tokenId, terms);
+
+    assetClassification = assetClassification_;
+    indicator = indicator_;
+    holder = holder_;
+    informationOnMixedHolding = informationOnMixedHolding_;
   }
 
   /**
@@ -189,6 +199,22 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
 
   function setTerms (string memory terms_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     terms = terms_;
+  }
+
+  function setAssetClassification (string memory assetClassification_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    assetClassification = assetClassification_;
+  }
+
+  function setIndicator (string memory indicator_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    indicator = indicator_;
+  }
+
+  function setHolder (string memory holder_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    holder = holder_;
+  }
+
+  function setInformationOnMixedHolding (string memory informationOnMixedHolding_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    informationOnMixedHolding = informationOnMixedHolding_;
   }
 
   function kill() public onlyRole(DEFAULT_ADMIN_ROLE) {
