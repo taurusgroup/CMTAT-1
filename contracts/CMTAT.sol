@@ -22,15 +22,23 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
   string public assetClassification;
   string public indicator;
   string public holder;
-  string public informationOnMixedHolding;  
+  string public informationOnMixedHolding;
+  string public productName;
+  string public isin;
+  string public nominalPrice;
+  string public issuer;
 
-  constructor (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms, string memory assetClassification_, string memory indicator_, string memory holder_, string memory informationOnMixedHolding_) {
+  constructor (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms, string memory assetClassification_, string memory indicator_, string memory holder_, string memory informationOnMixedHolding_, string memory productName_, string memory isin_, string memory nominalPrice_, string memory issuer_) {
     __CMTAT_init(owner, forwarder, name, symbol, tokenId, terms);
 
     assetClassification = assetClassification_;
     indicator = indicator_;
     holder = holder_;
     informationOnMixedHolding = informationOnMixedHolding_;
+    productName = productName_;
+    isin = isin_;
+    nominalPrice = nominalPrice_;
+    issuer = issuer_;
   }
 
   /**
@@ -215,6 +223,22 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
 
   function setInformationOnMixedHolding (string memory informationOnMixedHolding_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     informationOnMixedHolding = informationOnMixedHolding_;
+  }
+
+  function setProductName (string memory productName_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    productName = productName_;
+  }
+
+  function setISIN (string memory isin_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    isin = isin_;
+  }
+
+  function setNominalPrice (string memory nominalPrice_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    nominalPrice = nominalPrice_;
+  }
+
+  function setIssuer (string memory issuer_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    issuer = issuer_;
   }
 
   function kill() public onlyRole(DEFAULT_ADMIN_ROLE) {
