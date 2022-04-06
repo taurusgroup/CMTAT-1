@@ -28,18 +28,135 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
   string public nominalPrice;
   string public issuer;
 
-  constructor (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms, string memory assetClassification_, string memory indicator_, string memory holder_, string memory informationOnMixedHolding_, string memory productName_, string memory isin_, string memory nominalPrice_, string memory issuer_) {
+  constructor (address owner, address forwarder, string memory name, string memory symbol, string memory tokenId, string memory terms, string memory assetClassification_, string memory informationOnMixedHolding_, string memory isin_, string memory nominalPrice_, string memory metadata_) {
     __CMTAT_init(owner, forwarder, name, symbol, tokenId, terms);
 
     assetClassification = assetClassification_;
-    indicator = indicator_;
-    holder = holder_;
     informationOnMixedHolding = informationOnMixedHolding_;
-    productName = productName_;
     isin = isin_;
     nominalPrice = nominalPrice_;
-    issuer = issuer_;
+
+    slice memory dataSlice = toSlice(metadata_);
+    slice memory delim = toSlice(";");
+
+    holder = toString(split(dataSlice, delim));
+    issuer = toString(split(dataSlice, delim));
+    indicator = toString(split(dataSlice, delim));
+    productName = toString(split(dataSlice, delim));
   }
+
+  function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private pure returns (uint) {
+      uint ptr = selfptr;
+      uint idx;
+
+      if (needlelen <= selflen) {
+          if (needlelen <= 32) {
+              bytes32 mask;
+              if (needlelen > 0) {
+                  mask = bytes32(~(2 ** (8 * (32 - needlelen)) - 1));
+              }
+
+              bytes32 needledata;
+              assembly { needledata := and(mload(needleptr), mask) }
+
+              uint end = selfptr + selflen - needlelen;
+              bytes32 ptrdata;
+              assembly { ptrdata := and(mload(ptr), mask) }
+
+              while (ptrdata != needledata) {
+                  if (ptr >= end)
+                      return selfptr + selflen;
+                  ptr++;
+                  assembly { ptrdata := and(mload(ptr), mask) }
+              }
+              return ptr;
+          } else {
+              // For long needles, use hashing
+              bytes32 hash;
+              assembly { hash := keccak256(needleptr, needlelen) }
+
+              for (idx = 0; idx <= selflen - needlelen; idx++) {
+                  bytes32 testHash;
+                  assembly { testHash := keccak256(ptr, needlelen) }
+                  if (hash == testHash)
+                      return ptr;
+                  ptr += 1;
+              }
+          }
+      }
+      return selfptr + selflen;
+  }
+
+  struct slice {
+      uint _len;
+      uint _ptr;
+  }
+
+  function toSlice(string memory self) internal pure returns (slice memory) {
+      uint ptr;
+      assembly {
+          ptr := add(self, 0x20)
+      }
+      return slice(bytes(self).length, ptr);
+  }
+
+  function split(slice memory self, slice memory needle, slice memory token) internal pure returns (slice memory) {
+      uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);
+      token._ptr = self._ptr;
+      token._len = ptr - self._ptr;
+      if (ptr == self._ptr + self._len) {
+          // Not found
+          self._len = 0;
+      } else {
+          self._len -= token._len + needle._len;
+          self._ptr = ptr + needle._len;
+      }
+      return token;
+  }
+
+    /*
+     * @dev Splits the slice, setting `self` to everything after the first
+     *      occurrence of `needle`, and returning everything before it. If
+     *      `needle` does not occur in `self`, `self` is set to the empty slice,
+     *      and the entirety of `self` is returned.
+     * @param self The slice to split.
+     * @param needle The text to search for in `self`.
+     * @return The part of `self` up to the first occurrence of `delim`.
+     */
+    function split(slice memory self, slice memory needle) internal pure returns (slice memory token) {
+        split(self, needle, token);
+    }
+
+    function toString(slice memory self) internal pure returns (string memory) {
+        string memory ret = new string(self._len);
+        uint retptr;
+        assembly { retptr := add(ret, 32) }
+
+        memcpy(retptr, self._ptr, self._len);
+        return ret;
+    }
+
+    function memcpy(uint dest, uint src, uint len) private pure {
+        // Copy word-length chunks while possible
+        for(; len >= 32; len -= 32) {
+            assembly {
+                mstore(dest, mload(src))
+            }
+            dest += 32;
+            src += 32;
+        }
+
+        // Copy remaining bytes
+        uint mask = type(uint).max;
+        if (len > 0) {
+            mask = 256 ** (32 - len) - 1;
+        }
+        assembly {
+            let srcpart := and(mload(src), not(mask))
+            let destpart := and(mload(dest), mask)
+            mstore(dest, or(destpart, srcpart))
+        }
+    }
 
   /**
     * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
