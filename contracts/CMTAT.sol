@@ -330,32 +330,64 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
     assetClassification = assetClassification_;
   }
 
+  function getAssetClassification() public view returns (string memory) {
+    return assetClassification;
+  }
+
   function setIndicator (string memory indicator_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     indicator = indicator_;
+  }
+
+  function getIndicator() public view returns (string memory) {
+    return indicator;
   }
 
   function setHolder (string memory holder_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     holder = holder_;
   }
 
+  function getHolder() public view returns (string memory) {
+    return holder;
+  }
+
   function setInformationOnMixedHolding (string memory informationOnMixedHolding_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     informationOnMixedHolding = informationOnMixedHolding_;
+  }
+
+  function getInformationOnMixedHolding() public view returns (string memory) {
+    return informationOnMixedHolding;
   }
 
   function setProductName (string memory productName_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     productName = productName_;
   }
 
+  function getProductName() public view returns (string memory) {
+    return productName;
+  }
+
   function setISIN (string memory isin_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     isin = isin_;
+  }
+
+  function getISIN() public view returns (string memory) {
+    return isin;
   }
 
   function setNominalPrice (string memory nominalPrice_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     nominalPrice = nominalPrice_;
   }
 
+  function getNominalPrice() public view returns (string memory) {
+    return nominalPrice;
+  }
+
   function setIssuer (string memory issuer_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     issuer = issuer_;
+  }
+
+  function getIssuer() public view returns (string memory) {
+    return issuer;
   }
 
   function kill() public onlyRole(DEFAULT_ADMIN_ROLE) {
