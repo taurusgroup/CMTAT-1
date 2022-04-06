@@ -237,7 +237,7 @@ contract CMTAT is Initializable, ContextUpgradeable, BaseModule, AuthorizationMo
     nominalPrice = nominalPrice_;
   }
 
-  function setissuer (string memory issuer_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+  function setIssuer (string memory issuer_) public onlyRole(DEFAULT_ADMIN_ROLE) {
     issuer = issuer_;
   }
 
