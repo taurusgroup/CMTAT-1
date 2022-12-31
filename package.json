@@ -55,7 +55,7 @@
     "solium": "^1.2.4",
     "truffle": "^5.1.57",
     "truffle-flattener": "^1.2.12",
-    "truffle-hdwallet-provider": "0.0.6",
+    "truffle-hdwallet-provider": "1.0.17",
     "web3": "^1.0.0-beta.41"
   },
   "dependencies": {
